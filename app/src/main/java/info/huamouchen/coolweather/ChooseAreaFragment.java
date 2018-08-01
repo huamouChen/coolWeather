@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import java.util.List;
 import info.huamouchen.coolweather.db.City;
 import info.huamouchen.coolweather.db.County;
 import info.huamouchen.coolweather.db.Province;
+import info.huamouchen.coolweather.gson.Weather;
 import info.huamouchen.coolweather.util.HttpUtil;
 import info.huamouchen.coolweather.util.Utility;
 import okhttp3.Call;
@@ -105,10 +107,20 @@ public class ChooseAreaFragment extends Fragment {
                 queryCounties();
             } else if (currentLevel == LEVEL_COUNTY) {
                 String weatherId = countyList.get(i).getWeatherId();
-                Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                intent.putExtra("weather_id", weatherId);
-                startActivity(intent);
-                getActivity().finish();
+
+                // 第一次开启APP
+                if (getActivity() instanceof MainActivity) {
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else if (getActivity() instanceof WeatherActivity) { // 已经显示天气了
+                    WeatherActivity activity = (WeatherActivity) getActivity();
+                    activity.drawerLayout.closeDrawer(GravityCompat.START);
+                    // 刷新天气
+                    activity.swipeRefresh.setRefreshing(true);
+                    activity.requestWeather(weatherId);
+                }
             }
         });
 
