@@ -10,15 +10,13 @@ public class Weather {
 
     public Basic basic;
 
-    public CityUpdate update;
-
-    @SerializedName("daily_forecast")
-    public List<DailyForecast> forecastList;
+    public AQI aqi;
 
     public Now now;
 
-    public Aqi aqi;
+    public Suggestion suggestion;
 
-    public Lifestyle lifestyle;
+    @SerializedName("daily_forecast")
+    public List<Forecast> forecastList;
 
 }

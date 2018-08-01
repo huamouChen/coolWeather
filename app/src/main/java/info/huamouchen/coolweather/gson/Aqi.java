@@ -1,8 +1,15 @@
 package info.huamouchen.coolweather.gson;
 
-public class Aqi {
+public class AQI {
 
-    public String aqi;
+    public AQICity city;
 
-    public String pm25;
+    public class AQICity {
+
+        public String aqi;
+
+        public String pm25;
+
+    }
+
 }

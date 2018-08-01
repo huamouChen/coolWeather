@@ -3,9 +3,9 @@ package info.huamouchen.coolweather;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,7 +18,7 @@ import com.bumptech.glide.Glide;
 
 import java.io.IOException;
 
-import info.huamouchen.coolweather.gson.DailyForecast;
+import info.huamouchen.coolweather.gson.Forecast;
 import info.huamouchen.coolweather.gson.Weather;
 import info.huamouchen.coolweather.util.HttpUtil;
 import info.huamouchen.coolweather.util.Utility;
@@ -64,8 +64,6 @@ public class WeatherActivity extends AppCompatActivity {
         }
 
 
-
-
         setContentView(R.layout.activity_weather);
 
         // 初始化各控件
@@ -85,7 +83,7 @@ public class WeatherActivity extends AppCompatActivity {
         String weatherString = prefs.getString("weather", null);
         if (weatherString != null) {
             // 有缓存时直接解析天气数据
-            Weather weather = Utility.handleWeatherResponse(weatherString);
+             Weather weather = Utility.handleWeatherResponse(weatherString);
             showWeatherInfo(weather);
         } else {
             // 无缓存时去服务器查询天气
@@ -106,8 +104,7 @@ public class WeatherActivity extends AppCompatActivity {
     * 根据天气 id 请求城市天气信息
     * */
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId +
-                "&key=ee4374b9be6a4030be7770080086ebbb";
+        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=bc0418b57b2d4918819d3974ac1285d9";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -142,9 +139,9 @@ public class WeatherActivity extends AppCompatActivity {
     * */
     private void showWeatherInfo(Weather weather) {
         String cityName = weather.basic.cityName;
-        String updateTime = weather.update.loc;
-        String degree = weather.now.cond_txt;
-        String weatherInfo = weather.now.cond_txt;
+        String updateTime = weather.basic.update.updateTime.split(" ")[1];
+        String degree = weather.now.temperature + "℃";
+        String weatherInfo = weather.now.more.info;
 
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
@@ -152,26 +149,26 @@ public class WeatherActivity extends AppCompatActivity {
         weatherInfoText.setText(weatherInfo);
 
         forecastLayout.removeAllViews();
-        for (DailyForecast forecast : weather.forecastList) {
+        for (Forecast forecast : weather.forecastList) {
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
             TextView dateText = view.findViewById(R.id.date_text);
             TextView infoText = view.findViewById(R.id.info_text);
             TextView maxText = view.findViewById(R.id.max_text);
             TextView minText = view.findViewById(R.id.min_text);
 
-            dateText.setText(forecast.date_my);
-            infoText.setText(forecast.cond_txt_d);
-            maxText.setText(forecast.tmp_max);
-            minText.setText(forecast.tmp_min);
+            dateText.setText(forecast.date);
+            infoText.setText(forecast.more.info);
+            maxText.setText(forecast.temperature.max);
+            minText.setText(forecast.temperature.min);
             forecastLayout.addView(view);
         }
         if (weather.aqi != null) {
-            aqiText.setText(weather.aqi.aqi);
-            pm25Text.setText(weather.aqi.pm25);
+            aqiText.setText(weather.aqi.city.aqi);
+            pm25Text.setText(weather.aqi.city.pm25);
         }
-        String comfort = "舒适度：" + weather.lifestyle.brf;
-        String carWash = "洗车指数：" + weather.lifestyle.txt;
-        String sport = "运动建议：" + weather.lifestyle.txt;
+        String comfort = "舒适度：" + weather.suggestion.comfort.info;
+        String carWash = "洗车指数：" + weather.suggestion.carWash.info;
+        String sport = "运行建议：" + weather.suggestion.sport.info;
 
         comforText.setText(comfort);
         carWashText.setText(carWash);
