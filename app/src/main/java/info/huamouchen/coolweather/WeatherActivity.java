@@ -163,7 +163,7 @@ public class WeatherActivity extends AppCompatActivity {
 
                         // 启动 自动更新服务
                         Intent intent = new Intent(WeatherActivity.this, AutoUpdateService.class);
-                        startService(intent);
+//                        startService(intent);
 
                     } else {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
